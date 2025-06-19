@@ -1,0 +1,52 @@
+** start of main.py **
+
+import copy
+import random
+
+class Hat:
+    def __init__(self, **kwargs):
+        # Convert each count to a list of that color
+        self.contents = []
+        for color, count in kwargs.items():
+            self.contents.extend([color] * count)
+
+    def draw(self, num_balls):
+        # If requested more balls than are available, return all
+        if num_balls >= len(self.contents):
+            all_balls = self.contents[:]
+            self.contents.clear()
+            return all_balls
+        # Otherwise, randomly draw balls without replacement
+        drawn_balls = []
+        for _ in range(num_balls):
+            index = random.randint(0, len(self.contents) - 1)
+            drawn_balls.append(self.contents.pop(index))
+        return drawn_balls
+
+def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
+    successful_experiments = 0
+
+    for _ in range(num_experiments):
+        # Make a deep copy of the hat for each experiment
+        temp_hat = copy.deepcopy(hat)
+        drawn = temp_hat.draw(num_balls_drawn)
+
+        # Count the balls in the drawn list
+        counts = {}
+        for ball in drawn:
+            counts[ball] = counts.get(ball, 0) + 1
+
+        # Check if all expected balls are present in the required quantities
+        success = True
+        for color, count in expected_balls.items():
+            if counts.get(color, 0) < count:
+                success = False
+                break
+
+        if success:
+            successful_experiments += 1
+
+    return successful_experiments / num_experiments
+
+** end of main.py **
+
